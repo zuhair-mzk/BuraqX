@@ -1,9 +1,23 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter_Tight, Cairo, Aref_Ruqaa } from 'next/font/google';
 import './globals.css';
 import LayoutShell from '@/components/LayoutShell';
 
-const inter = Inter({ subsets: ['latin'] });
+const interTight = Inter_Tight({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+const cairo = Cairo({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+});
+const arefRuqaa = Aref_Ruqaa({
+  weight: ['400', '700'],
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Buraq X - Your Muslim Community Concierge',
@@ -24,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={interTight.className}>
         <LayoutShell>{children}</LayoutShell>
       </body>
     </html>

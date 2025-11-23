@@ -19,6 +19,7 @@ export default function ProviderChatPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,6 +29,39 @@ export default function ProviderChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const saveChatHistory = async (updatedMessages: Message[]) => {
+    if (!provider || updatedMessages.length === 0) return;
+
+    try {
+      const firstUserMessage = updatedMessages.find(m => m.role === 'user');
+      const title = firstUserMessage 
+        ? `${provider.title}: ${firstUserMessage.content.slice(0, 40)}...`
+        : `Chat with ${provider.title}`;
+
+      const response = await fetch('/api/chat-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: currentChatId,
+          title,
+          messages: updatedMessages,
+          chatType: 'provider_ai',
+          providerId: provider.id,
+          providerName: provider.title,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (!currentChatId) {
+          setCurrentChatId(data.chat.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving chat history:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchProvider = async () => {
@@ -98,7 +132,9 @@ export default function ProviderChatPage() {
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      const updatedMessages = [...messages, userMessage, assistantMessage];
+      setMessages(updatedMessages);
+      await saveChatHistory(updatedMessages);
     } catch (error) {
       console.error('[BURAQ_X] Provider chat error:', error);
 

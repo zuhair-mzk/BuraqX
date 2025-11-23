@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 // Mock service data - 40 different services
 const mockServices = [
@@ -60,20 +61,26 @@ export default function AdminPage() {
   });
 
   return (
-    <div className="min-h-screen bg-black">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#151515] to-[#0f0f0f]"
+    >
       {/* Header */}
-      <section className="relative py-10 sm:py-16 border-b border-zinc-950">
+      <section className="relative pt-8 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-light text-white mb-1.5 sm:mb-2">Admin</h1>
-              <p className="text-xs sm:text-sm text-zinc-600 font-light">
+              <h1 className="text-2xl font-light text-white mb-1">Admin</h1>
+              <p className="text-xs text-zinc-600 font-light">
                 {filteredServices.length} providers
               </p>
             </div>
             <Link
               href="/"
-              className="px-3 sm:px-4 py-2 text-xs text-zinc-500 hover:text-zinc-400 transition-colors font-light"
+              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors font-light"
             >
               Back
             </Link>
@@ -82,7 +89,7 @@ export default function AdminPage() {
       </section>
 
       {/* Filters */}
-      <section className="py-6 sm:py-8 border-b border-zinc-950">
+      <section className="py-4 sm:py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col gap-3 sm:gap-4">
             {/* Search */}
@@ -180,6 +187,6 @@ export default function AdminPage() {
           )}
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 }

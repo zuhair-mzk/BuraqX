@@ -8,14 +8,53 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  role      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String        @id @default(cuid())
+  name        String
+  email       String        @unique
+  password    String?
+  role        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  chatHistory ChatHistory[]
 
   @@map("users")
+}
+
+model ChatHistory {
+  id           String   @id @default(cuid())
+  userId       String
+  title        String
+  messages     Json
+  category     String?
+  chatType     String   @default("general") // "general", "provider_ai", "direct_provider"
+  providerId   String?
+  providerName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([chatType])
+  @@map("chat_history")
+}
+
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  color       String?  @default("#3b82f6")
+  isAllDay    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([startTime])
+  @@map("calendar_events")
 }
 
 model Category {

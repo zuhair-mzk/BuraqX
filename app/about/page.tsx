@@ -1,9 +1,18 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { V1_CATEGORIES } from '@/lib/models';
 
 export default function AboutPage() {
   return (
-    <div className="bg-black min-h-screen">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="bg-gradient-to-br from-[#0a0a0a] via-[#151515] to-[#0f0f0f] min-h-screen"
+    >
       {/* Hero Section */}
       <section className="relative py-20 sm:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)]" />
@@ -105,6 +114,30 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Verse Section - Premium Feature */}
+      <section className="py-32 border-t border-zinc-950">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <div className="mb-8 overflow-x-auto">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white mb-6 inline-block" style={{ fontFamily: "'Cairo', sans-serif", lineHeight: "1.6", whiteSpace: "nowrap" }}>
+              وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ
+            </h2>
+            <p className="text-[15px] text-zinc-500 italic mb-2">
+              "And cooperate in righteousness and piety"
+            </p>
+            <p className="text-[12px] text-zinc-700">
+              Surah Al-Ma'idah, 5:2
+            </p>
+          </div>
+          <div className="mt-12 pt-12 border-t border-zinc-950">
+            <p className="text-base text-zinc-400 font-light leading-relaxed">
+              This verse guides our mission. We believe in the power of community,
+              the strength in helping one another, and the importance of connecting
+              people with trusted services.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Mission Section */}
       <section className="py-24 border-t border-zinc-950">
         <div className="max-w-3xl mx-auto px-6">
@@ -128,6 +161,6 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 }

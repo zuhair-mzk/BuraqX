@@ -9,7 +9,7 @@
   }
   
   body {
-    @apply bg-black text-white;
+    @apply bg-[#0d0d0f] text-white;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -31,7 +31,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-black;
+    @apply bg-zinc-900;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -45,7 +45,7 @@
 
   /* Premium focus rings */
   *:focus-visible {
-    @apply outline-none ring-2 ring-zinc-700/50 ring-offset-2 ring-offset-black;
+    @apply outline-none ring-2 ring-zinc-700/50 ring-offset-2 ring-offset-zinc-900;
     transition: all 0.3s ease;
   }
 
@@ -75,11 +75,11 @@
   }
   
   .btn-accent {
-    @apply px-6 py-2.5 bg-gradient-to-r from-accent-600 to-accent-500 text-white rounded-xl font-medium
-           hover:from-accent-500 hover:to-accent-400 hover:shadow-lg hover:shadow-accent-500/20
+    @apply px-6 py-2.5 bg-accent text-dark rounded-xl font-medium
+           hover:bg-accent-hover hover:shadow-lg hover:shadow-glow
            active:scale-[0.98]
            transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 focus:ring-offset-zinc-950
+           focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-dark
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
@@ -106,5 +106,50 @@
   
   .section-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  /* Infinite scroll animations */
+  @keyframes scroll-left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes scroll-right {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-scroll-left {
+    animation: scroll-left 20s linear infinite;
+  }
+
+  .animate-scroll-right {
+    animation: scroll-right 20s linear infinite;
+  }
+
+  /* Fade in animation for text */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }

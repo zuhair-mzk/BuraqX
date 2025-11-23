@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function JoinPage() {
   const [formData, setFormData] = useState({
@@ -28,7 +29,12 @@ export default function JoinPage() {
 
   if (submitSuccess) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-6">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#151515] to-[#0f0f0f] flex items-center justify-center px-6"
+      >
         <div className="max-w-md text-center animate-fade-in">
           <div className="mb-8">
             <div className="w-16 h-16 mx-auto bg-white rounded-full flex items-center justify-center">
@@ -48,21 +54,25 @@ export default function JoinPage() {
             Back to home
           </Link>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#151515] to-[#0f0f0f]"
+    >
       {/* Hero */}
-      <section className="relative py-16 sm:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)]" />
+      <section className="relative py-20 sm:py-28">
         <div className="relative max-w-3xl mx-auto px-6 text-center">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-tight leading-tight mb-4 sm:mb-6">
-            <span className="block text-white">Become a</span>
-            <span className="block text-white/40 mt-1">Provider</span>
+          <h1 className="text-3xl sm:text-5xl font-light tracking-tight leading-tight mb-3">
+            <span className="text-white">Become a Provider</span>
           </h1>
-          <p className="text-sm sm:text-base text-zinc-500 font-light max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm text-zinc-600 font-light max-w-lg mx-auto">
             Join our network of trusted professionals
           </p>
         </div>
@@ -165,7 +175,7 @@ export default function JoinPage() {
           </form>
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 }
 
