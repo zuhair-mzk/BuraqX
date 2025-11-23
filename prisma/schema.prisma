@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  label       String
+  type        String
+  description String?
+  keywords    String[]
+  listings    Listing[]
+
+  @@map("categories")
+}
+
+model Listing {
+  id                    String    @id @default(cuid())
+  title                 String
+  description           String
+  categoryId            String
+  type                  String
+  locationText          String
+  tags                  String[]
+  isFeatured            Boolean   @default(false)
+  status                String    @default("pending")
+  genderOfProvider      String?
+  certifications        String[]
+  yearsOfExperience     Int?
+  pricingMin            Float?
+  pricingMax            Float?
+  pricingCurrency       String?   @default("CAD")
+  pricingUnit           String?
+  responseTime          String?
+  communityEndorsements Int       @default(0)
+  contactEmail          String?
+  contactPhone          String?
+  eventDate             DateTime?
+  eventTime             String?
+  recurring             Boolean?  @default(false)
+  recurringPattern      String?
+  genderRestriction     String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  category              Category  @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([locationText])
+  @@map("listings")
+}
+
+model Suggestion {
+  id               String   @id @default(cuid())
+  rawQueryText     String
+  inferredCategory String?
+  location         String?
+  createdAt        DateTime @default(now())
+
+  @@map("suggestions")
+}
