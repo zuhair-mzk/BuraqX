@@ -14,100 +14,135 @@ export default function HomePage() {
     }
   };
 
+  const exampleQueries = [
+    { text: 'Find me a math tutor', icon: '📚' },
+    { text: 'Affordable photographer', icon: '📸' },
+    { text: 'Plumber near me', icon: '🔧' },
+    { text: 'Sisters halaqa events', icon: '🕌' },
+    { text: 'Wedding photographer', icon: '💍' },
+    { text: 'Quran teacher for kids', icon: '📖' },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center px-4">
+    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 overflow-hidden">
+      {/* Minimal Background */}
+      <div className="absolute inset-0 bg-black" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)]" />
+      
       {/* Main Content */}
-      <div className="w-full max-w-2xl mx-auto text-center space-y-8 animate-fade-in">
-        {/* Logo and Tagline */}
-        <div className="space-y-4">
-          <h1 className="text-5xl md:text-6xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-            Buraq X
-          </h1>
-          <p className="text-base md:text-lg text-gray-400 font-light max-w-xl mx-auto">
-            Your trusted Muslim community marketplace
+      <div className="relative w-full max-w-4xl mx-auto text-center space-y-16 animate-fade-in-up">
+        {/* Hero Section */}
+        <div className="space-y-12 sm:space-y-16">
+          <div className="space-y-3">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.1]">
+              <span className="block text-white opacity-0 animate-fade-in" style={{animationDelay: '0.1s', animationFillMode: 'forwards'}}>
+                Welcome to BuraqX
+              </span>
+            </h1>
+          </div>
+          
+          <p className="text-xs sm:text-sm text-zinc-500 font-light max-w-sm mx-auto leading-loose tracking-wide px-4 opacity-0 animate-fade-in" style={{animationDelay: '0.5s', animationFillMode: 'forwards'}}>
+            Everything you need, delivered with care
           </p>
         </div>
 
         {/* Search Box */}
-        <form onSubmit={handleSearch} className="relative group">
+        <form onSubmit={handleSearch} className="relative max-w-xl mx-auto px-4 opacity-0 animate-fade-in" style={{animationDelay: '0.7s', animationFillMode: 'forwards'}}>
           <div className="relative">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="What are you looking for? (e.g., 'math tutor in Scarborough')"
-              className="w-full px-5 py-4 pr-24 text-base rounded-xl border border-gray-700 bg-[#1a1a1a]
-                       text-white placeholder:text-gray-500
-                       focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-700
-                       transition-all duration-300 shadow-lg hover:border-gray-600"
+              placeholder="Search for services..."
+              className="w-full px-6 py-4 bg-white/5 backdrop-blur-sm border border-zinc-800/30 rounded-full text-white placeholder:text-zinc-600
+                       focus:outline-none focus:border-zinc-700/50 focus:bg-white/[0.07]
+                       transition-all duration-500 text-sm font-light tracking-wide"
             />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 
-                       bg-white hover:bg-gray-200 text-black 
-                       px-5 py-2 rounded-lg font-medium text-sm
-                       transition-all duration-200"
+              disabled={!query.trim()}
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-white text-black rounded-full text-xs font-medium
+                       transition-all duration-500 hover:bg-zinc-100
+                       disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Search
             </button>
           </div>
         </form>
 
-        {/* Quick Examples */}
-        <div className="space-y-3">
-          <p className="text-xs text-gray-500 font-medium">Try asking:</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {[
-              'Find me a math tutor',
-              'Affordable photographer',
-              'Plumber near me',
-              'Sisters halaqa events',
-            ].map((example) => (
-              <button
-                key={example}
-                onClick={() => setQuery(example)}
-                className="px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg
-                         text-xs text-gray-400 hover:border-gray-700 hover:text-gray-300
-                         transition-all duration-200"
-              >
-                {example}
-              </button>
-            ))}
+        {/* Animated Popular Searches */}
+        <div className="overflow-hidden -mx-4 opacity-0 animate-fade-in" style={{animationDelay: '0.9s', animationFillMode: 'forwards'}}>
+          {/* Infinite Scroll Container - Three Rows */}
+          <div className="relative h-16 sm:h-20 w-full space-y-2">
+            {/* Gradient Overlays */}
+            <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+            
+            {/* Row 1 - Scrolling Left */}
+            <div className="relative h-8 w-full overflow-hidden">
+              <div className="absolute flex gap-6 animate-scroll-left whitespace-nowrap items-center">
+                {[...exampleQueries.slice(0, 2), ...exampleQueries.slice(0, 2), ...exampleQueries.slice(0, 2), ...exampleQueries.slice(0, 2)].map((example, index) => (
+                  <span
+                    key={`row1-${example.text}-${index}`}
+                    onClick={() => setQuery(example.text)}
+                    className="text-xs text-zinc-700 hover:text-zinc-500 cursor-pointer transition-colors duration-300 flex-shrink-0 font-light"
+                  >
+                    {example.text}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            {/* Row 2 - Scrolling Right */}
+            <div className="relative h-8 w-full overflow-hidden">
+              <div className="absolute flex gap-6 animate-scroll-right whitespace-nowrap items-center">
+                {[...exampleQueries.slice(2, 4), ...exampleQueries.slice(2, 4), ...exampleQueries.slice(2, 4), ...exampleQueries.slice(2, 4)].map((example, index) => (
+                  <span
+                    key={`row2-${example.text}-${index}`}
+                    onClick={() => setQuery(example.text)}
+                    className="text-xs text-zinc-700 hover:text-zinc-500 cursor-pointer transition-colors duration-300 flex-shrink-0 font-light"
+                  >
+                    {example.text}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            {/* Row 3 - Scrolling Left */}
+            <div className="relative h-8 w-full overflow-hidden">
+              <div className="absolute flex gap-6 animate-scroll-left whitespace-nowrap items-center">
+                {[...exampleQueries.slice(4), ...exampleQueries.slice(4), ...exampleQueries.slice(4), ...exampleQueries.slice(4)].map((example, index) => (
+                  <span
+                    key={`row3-${example.text}-${index}`}
+                    onClick={() => setQuery(example.text)}
+                    className="text-xs text-zinc-700 hover:text-zinc-500 cursor-pointer transition-colors duration-300 flex-shrink-0 font-light"
+                  >
+                    {example.text}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Stats or Social Proof (optional) */}
-        <div className="pt-6 flex justify-center gap-10 text-center">
-          <div>
-            <div className="text-2xl font-bold text-white">100+</div>
-            <div className="text-xs text-gray-500">Trusted Providers</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white">5</div>
-            <div className="text-xs text-gray-500">Categories</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white">GTA</div>
-            <div className="text-xs text-gray-500">Coverage</div>
-          </div>
+        {/* Stats Section */}
+        <div className="pt-8 grid grid-cols-3 gap-8 max-w-2xl mx-auto px-4 opacity-0 animate-fade-in" style={{animationDelay: '1.1s', animationFillMode: 'forwards'}}>
+          {[
+            { value: '100+', label: 'Providers' },
+            { value: '5', label: 'Categories' },
+            { value: 'GTA', label: 'Coverage' },
+          ].map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="text-2xl sm:text-3xl font-light text-white/90">
+                {stat.value}
+              </div>
+              <div className="text-[10px] text-zinc-700 mt-2 font-light uppercase tracking-wider">
+                {stat.label}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

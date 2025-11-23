@@ -46,14 +46,17 @@ export default function JoinForm({ categories }: JoinFormProps) {
     setSubmitError('');
 
     try {
+      // Convert form data to API format - keep tags and certifications as strings
       const payload = {
         ...formData,
+        // Keep as strings - the schema will transform them
         tags: formData.tags,
         certifications: formData.certifications || undefined,
         yearsOfExperience: formData.yearsOfExperience ? parseInt(formData.yearsOfExperience) : undefined,
         pricingMin: formData.pricingMin ? parseFloat(formData.pricingMin) : undefined,
         pricingMax: formData.pricingMax ? parseFloat(formData.pricingMax) : undefined,
         pricingCurrency: formData.pricingMin || formData.pricingMax ? 'CAD' : undefined,
+        // Remove empty phone to avoid validation error
         phone: formData.phone || undefined,
       };
 
@@ -80,73 +83,60 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
   if (submitSuccess) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16">
-        <div className="max-w-lg mx-auto text-center animate-fade-in-up">
-          <div className="card-glass p-12">
-            <div className="mb-6">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-4">Listing Submitted! 🎉</h1>
-            <p className="text-zinc-400 mb-8 leading-relaxed">
-              JazakAllah Khair for joining Buraq X! Your listing has been submitted for review.
-              We'll review it and get back to you within 24-48 hours inshaAllah.
-            </p>
-            <button
-              onClick={() => {
-                setSubmitSuccess(false);
-                setFormData({
-                  name: '',
-                  orgName: '',
-                  email: '',
-                  phone: '',
-                  type: 'supplier',
-                  categoryId: '',
-                  locationText: '',
-                  description: '',
-                  tags: '',
-                  genderOfProvider: '',
-                  certifications: '',
-                  yearsOfExperience: '',
-                  pricingMin: '',
-                  pricingMax: '',
-                  pricingUnit: 'hour',
-                  responseTime: '',
-                });
-              }}
-              className="btn-primary"
-            >
-              Submit Another Listing
-            </button>
-          </div>
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="mb-6">
+          <svg className="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
+        <h1 className="text-3xl font-bold mb-4">Listing Submitted! 🎉</h1>
+        <p className="text-gray-600 mb-6">
+          JazakAllah Khair for joining Buraq X! Your listing has been submitted for review.
+          We'll review it and get back to you within 24-48 hours inshaAllah.
+        </p>
+        <button
+          onClick={() => {
+            setSubmitSuccess(false);
+            setFormData({
+              name: '',
+              orgName: '',
+              email: '',
+              phone: '',
+              type: 'supplier',
+              categoryId: '',
+              locationText: '',
+              description: '',
+              tags: '',
+              genderOfProvider: '',
+              certifications: '',
+              yearsOfExperience: '',
+              pricingMin: '',
+              pricingMax: '',
+              pricingUnit: 'hour',
+              responseTime: '',
+            });
+          }}
+          className="btn-primary"
+        >
+          Submit Another Listing
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-12 px-4">
-      <div className="section-container max-w-4xl">
-        <div className="mb-12 text-center animate-fade-in-up">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Join as a{' '}
-            <span className="bg-gradient-to-r from-accent-400 to-accent-600 bg-clip-text text-transparent">
-              Provider
-            </span>
-          </h1>
-          <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-            Fill out the form below to create your listing. We'll review it and get back to you within 24-48 hours inshaAllah.
-          </p>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="card">
+        <h1 className="text-3xl font-bold mb-2">Join Buraq X as a Provider</h1>
+        <p className="text-gray-600 mb-8">
+          Fill out the form below to create your listing. We'll review it and get back to you within 24-48 hours inshaAllah.
+        </p>
 
-        <form onSubmit={handleSubmit} className="card-glass space-y-8 animate-fade-in">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Type */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
-              Profile Type <span className="text-accent-400">*</span>
+            <label className="block text-sm font-medium mb-2">
+              Profile Type <span className="text-red-500">*</span>
             </label>
             <select
               required
@@ -161,10 +151,10 @@ export default function JoinForm({ categories }: JoinFormProps) {
           </div>
 
           {/* Name and Organization */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-zinc-300 mb-3">
-                Your Name <span className="text-accent-400">*</span>
+              <label className="block text-sm font-medium mb-2">
+                Your Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -176,7 +166,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-300 mb-3">
+              <label className="block text-sm font-medium mb-2">
                 Business / Organization Name
               </label>
               <input
@@ -190,10 +180,10 @@ export default function JoinForm({ categories }: JoinFormProps) {
           </div>
 
           {/* Email and Phone */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-zinc-300 mb-3">
-                Email <span className="text-accent-400">*</span>
+              <label className="block text-sm font-medium mb-2">
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -205,7 +195,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-300 mb-3">
+              <label className="block text-sm font-medium mb-2">
                 Phone Number
               </label>
               <input
@@ -220,8 +210,8 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
-              Category <span className="text-accent-400">*</span>
+            <label className="block text-sm font-medium mb-2">
+              Category <span className="text-red-500">*</span>
             </label>
             <select
               required
@@ -237,7 +227,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
               ))}
             </select>
             {selectedCategory && (
-              <div className="mt-3">
+              <div className="mt-2">
                 <CategoryBadge categoryId={selectedCategory.id} />
               </div>
             )}
@@ -245,8 +235,8 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Location */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
-              Location / Area Served <span className="text-accent-400">*</span>
+            <label className="block text-sm font-medium mb-2">
+              Location / Area Served <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -260,23 +250,23 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
-              Description <span className="text-accent-400">*</span>
+            <label className="block text-sm font-medium mb-2">
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
               required
-              rows={5}
+              rows={4}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="input-field resize-none"
+              className="input-field"
               placeholder="Describe your services, experience, and what makes you unique..."
             />
-            <p className="text-sm text-zinc-500 mt-2">Minimum 10 characters</p>
+            <p className="text-sm text-gray-500 mt-1">Minimum 10 characters</p>
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
+            <label className="block text-sm font-medium mb-2">
               Tags (comma-separated)
             </label>
             <input
@@ -289,9 +279,9 @@ export default function JoinForm({ categories }: JoinFormProps) {
           </div>
 
           {/* Gender and Experience */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-zinc-300 mb-3">
+              <label className="block text-sm font-medium mb-2">
                 Gender of Provider
               </label>
               <select
@@ -306,7 +296,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-300 mb-3">
+              <label className="block text-sm font-medium mb-2">
                 Years of Experience
               </label>
               <input
@@ -322,7 +312,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Pricing */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-4">
+            <label className="block text-sm font-medium mb-4">
               Pricing (Optional)
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -360,7 +350,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Certifications */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
+            <label className="block text-sm font-medium mb-2">
               Certifications (comma-separated)
             </label>
             <input
@@ -374,7 +364,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Response Time */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-300 mb-3">
+            <label className="block text-sm font-medium mb-2">
               Typical Response Time
             </label>
             <input
@@ -388,7 +378,7 @@ export default function JoinForm({ categories }: JoinFormProps) {
 
           {/* Error Message */}
           {submitError && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
               {submitError}
             </div>
           )}
@@ -398,21 +388,11 @@ export default function JoinForm({ categories }: JoinFormProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-accent w-full py-4 text-lg"
+              className="btn-primary w-full py-3 text-lg"
             >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Submitting...
-                </span>
-              ) : (
-                'Submit Listing for Review'
-              )}
+              {isSubmitting ? 'Submitting...' : 'Submit Listing for Review'}
             </button>
-            <p className="text-sm text-zinc-500 text-center mt-4">
+            <p className="text-sm text-gray-500 text-center mt-3">
               By submitting, you agree to our terms and that your information will be reviewed by our team.
             </p>
           </div>

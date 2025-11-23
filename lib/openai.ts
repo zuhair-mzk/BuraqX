@@ -29,11 +29,12 @@ export async function parseUserMessageWithAI(
   tags: string[];
   isSupported: boolean;
   filters: {
-    minYearsExperience?: number;
-    maxPrice?: number;
+    minYearsExperience?: number | null;
+    maxPrice?: number | null;
     certifications?: string[];
   };
   searchKeywords: string[];
+  conversationalResponse?: string;
 }> {
   // Fetch categories from database
   const categories = await prisma.category.findMany();
@@ -42,7 +43,7 @@ export async function parseUserMessageWithAI(
     (cat) => `- ${cat.label} (id: ${cat.id}, slug: ${cat.slug}): ${cat.description}`
   ).join('\n');
 
-  const prompt = `You are a highly intelligent assistant for Buraq X, a Muslim community service marketplace. Your job is to understand natural language queries and match them to service providers.
+  const prompt = `You are an exceptionally intelligent, conversational AI assistant for Buraq X, a Muslim community service marketplace. You understand human language naturally, including vague, casual, or incomplete requests.
 
 Available service categories:
 ${categoriesDescription}
@@ -50,58 +51,120 @@ ${categoriesDescription}
 User message: "${message}"
 ${providedLocation ? `User's location: ${providedLocation}` : ''}
 
-TASK: Analyze the user's message deeply and extract structured search criteria.
+YOUR ROLE: Interpret the user's intent like a helpful human concierge would. Be extremely flexible and understanding.
 
-UNDERSTANDING INTENT:
-- Vague queries like "find me a great guy", "someone reliable", "good tutor" → Look for quality indicators
-- Phrases like "great", "excellent", "experienced", "reliable", "trusted" → Extract as quality expectations
-- Budget hints like "affordable", "cheap", "reasonable" → Set lower price ranges
-- Specific subjects like "calculus", "programming", "physics" → Extract as tags for matching
-- Academic levels like "university", "high school", "elementary" → Extract as tags
-- Personal preferences like "patient", "friendly", "professional" → Extract as tags
-- Gender hints: "sister", "brother", "female", "male", "woman", "man" → Gender preference
-- Time urgency: "urgent", "ASAP", "soon", "tonight", "flexible", "whenever" → Urgency level
+NATURAL LANGUAGE UNDERSTANDING:
+Think like ChatGPT - understand context, implied meaning, and casual language:
 
-CATEGORY MATCHING:
-- "tutor", "tutoring", "teach", "help with math/science" → STEM Tutoring
-- "photographer", "videographer", "designer", "creative" → Creative Freelancers
-- "plumber", "electrician", "repair", "handyman", "fix" → Home Services
-- "masjid", "mosque", "halaqa", "event", "sisters circle" → Masjid & MSA Events
-- "wedding", "henna", "mehndi", "nikah", "walima" → Wedding Services
+ULTRA-FLEXIBLE QUERY EXAMPLES:
+- "I need help" → Could be tutoring, home repair, or general services (look for context clues)
+- "someone good" / "reliable person" / "great guy" → Generic search, use quality indicators
+- "find me X" / "looking for X" / "need X" → Direct service request
+- "can you help me with Y" → Service need for Y
+- "who does Z around here" → Local service search for Z
+- Just a subject: "calculus" / "physics" → Tutoring for that subject
+- Just a service: "photographer" / "plumber" → Direct service category
+- Conversational: "my sink is broken" → Home services/plumber
+- Problem-based: "kid needs math help" → Tutoring
+- Event-based: "planning my wedding" → Wedding services
+- Community: "islamic classes" / "halaqa" → Masjid events
+- Vague quality: "someone experienced" / "best tutor" → High-quality filter
+- Comparison: "better option" / "alternative" → Quality preference
+- Recommendation: "who would you recommend" → Open-ended search
 
-QUALITY INDICATORS (extract as tags):
-- "great", "excellent", "experienced", "reliable", "trusted", "professional" → High quality expectation
-- "patient", "friendly", "understanding", "kind" → Teaching style preference
-- "expert", "specialist", "best", "top" → Expert level
-- "affordable", "cheap", "budget", "reasonable" → Budget-conscious
+CONTEXT CLUES TO EXTRACT:
+1. SERVICE TYPE (primary goal):
+   - Academic words → Tutoring
+   - Creative/media → Freelancers  
+   - Repair/fix/install → Home services
+   - Religious/community → Events
+   - Marriage/ceremony → Wedding
 
-FILTERS:
-- Years of experience: Extract numbers like "10 years", "experienced", "veteran" → minYearsExperience
-- Price: "under $50", "affordable", "budget" → maxPrice (estimate if vague)
-- Certifications: "certified", "licensed", "P.Eng", "degree" → Extract if specific
+2. QUALITY SIGNALS (tag as keywords):
+   - Adjectives: great, good, best, excellent, reliable, trusted, professional, experienced, expert, skilled, qualified, certified
+   - Teaching style: patient, friendly, kind, understanding, clear, helpful, supportive
+   - Professionalism: professional, punctual, organized, detailed, thorough
+   - Budget: affordable, cheap, budget-friendly, reasonable, economical, inexpensive
+
+3. SPECIFICS (tags):
+   - Subjects: math, calculus, physics, chemistry, biology, English, programming, coding, etc.
+   - Academic levels: elementary, middle school, high school, university, college, undergraduate, graduate
+   - Skills: photography, videography, graphic design, web design, etc.
+   - Services: plumbing, electrical, carpentry, painting, cleaning, etc.
+   - Wedding: mehndi, henna, photography, catering, decor, venue
+   - Events: halaqa, classes, lectures, Quran, tajweed, Islamic studies
+
+4. PERSONAL PREFERENCES:
+   - Gender: "sister", "brother", "female", "male", "woman", "man", "aunty", "uncle" → Gender preference
+   - Age/experience: "young", "experienced", "veteran", "senior", "new" → Experience level
+   - Personality: extract adjectives as tags
+
+5. CONSTRAINTS:
+   - Location: Any city, neighborhood, region in GTA or "near me", "local", "nearby"
+   - Time: "urgent", "ASAP", "emergency", "soon", "tonight", "today" → urgent; "flexible", "whenever", "no rush" → flexible
+   - Budget: Numbers with $ or words like "under", "max", "budget", "affordable"
+   - Experience: Numbers with "years" → minYearsExperience
+
+BE SMART ABOUT CONVERSATIONAL VS SERVICE REQUESTS:
+
+CONVERSATIONAL (return null categoryId):
+- Greetings: "hi", "hello", "hey", "yo", "yeo", "sup", "what's up"
+- Small talk: "how are you", "thanks", "thank you", "ok", "cool", "nice"
+- Clarifications: "what?", "huh?", "I don't know", "maybe", "not sure"
+- Generic: "help", "I need help", "can you help me" (without specifics)
+- Questions about the service: "what do you do", "how does this work", "who are you"
+
+SERVICE REQUESTS (match to category):
+- Specific needs: "I need a math tutor", "find me a plumber", "looking for photographer"
+- Problem statements: "my sink is broken", "kid needs help with calculus"
+- Direct subjects: "math tutor", "physics help", "wedding photography"
+- Service-related: "fix", "repair", "teach", "photograph", "design" with context
+
+MATCHING STRATEGY:
+- If someone just says "math", "physics", "calculus" → STEM Tutoring
+- If someone says "fix", "repair", "broken" with an object → Home Services  
+- If someone mentions any creative skill → Creative Freelancers
+- If someone mentions religious/community terms → Masjid Events
+- If someone mentions marriage/ceremony → Wedding Services
+- Extract ALL quality words as tags for better matching
+- Be creative with synonyms and related concepts
+- Generate rich searchKeywords for semantic search
+
+CRITICAL RULE: Return null categoryId for pure conversation/greetings. Only match when there's a clear service need!
 
 OUTPUT FORMAT (JSON):
 {
-  "categoryId": "use_actual_category_id_from_list_above" or null,
-  "location": "extracted_city_or_area" or null,
+  "categoryId": "exact_id_from_categories_above" (prefer guessing over null),
+  "location": "extracted_location" or null,
   "genderPreference": "male" | "female" | "mixed" | "unspecified" | null,
   "urgency": "urgent" | "flexible" | null,
-  "tags": ["quality_tags", "subject_tags", "level_tags", "style_tags"],
+  "tags": ["ALL_extracted_quality_words", "subjects", "levels", "preferences", "styles", "inferred_needs"],
   "filters": {
     "minYearsExperience": number or null,
     "maxPrice": number or null,
     "certifications": ["specific_certs"] or []
   },
-  "searchKeywords": ["important_words_for_semantic_search"]
+  "searchKeywords": ["key_concepts", "synonyms", "related_terms", "extracted_qualities", "inferred_terms"],
+  "conversationalResponse": "natural_friendly_response_if_just_conversation" or null
 }
 
-IMPORTANT: Use the EXACT category ID from the list above, not a made-up ID.`;
+CONVERSATIONAL RESPONSE GUIDELINES:
+If the message is purely conversational (greetings, small talk, emotions), set categoryId to null and provide a natural, friendly conversationalResponse. Examples:
+- "hey" → "Hey! What's up?"
+- "how's everything" → "All good! What can I help you with?"
+- "I'm tired" → "Hope you get some rest! Let me know if you need anything."
+- "thanks" → "You're welcome!"
+- Be warm, natural, and brief like a real conversation
+- Don't mention services unless they ask
+
+BE MAXIMALLY HELPFUL AND NATURAL - respond like a friendly human assistant!`;
 
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o-mini', // Fast model for quick responses
     messages: [{ role: 'user', content: prompt }],
-    temperature: 0.3,
+    temperature: 0.7, // High temperature for maximum creativity and flexibility
     response_format: { type: 'json_object' },
+    max_tokens: 300, // Limit tokens for faster parsing responses
   });
 
   const result = JSON.parse(completion.choices[0].message.content || '{}');
@@ -118,6 +181,7 @@ IMPORTANT: Use the EXACT category ID from the list above, not a made-up ID.`;
     isSupported: category !== null,
     filters: result.filters || {},
     searchKeywords: result.searchKeywords || [],
+    conversationalResponse: result.conversationalResponse || undefined,
   };
 }
 

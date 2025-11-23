@@ -11,14 +11,7 @@ export default function ChatPage() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   
-  const [messages, setMessages] = useState<ChatMessageType[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: "As-salamu alaykum! I'm Buraq X, your Muslim community concierge. How can I help you today? You can ask me about STEM tutoring, creative freelancers, home services, masjid events, or wedding services.",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [input, setInput] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(false);
   const [currentMatches, setCurrentMatches] = useState<Listing[]>([]);
@@ -102,13 +95,13 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[#0f0f0f]">
+    <div className="flex flex-col h-screen bg-black">
       <div className="flex-1 overflow-hidden flex">
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative">
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-6">
-            <div className="max-w-3xl mx-auto space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-8 sm:py-12 relative">
+            <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
               {messages.map((message: ChatMessageType) => (
                 <ChatMessage
                   key={message.id}
@@ -119,9 +112,33 @@ export default function ChatPage() {
               ))}
               
               {isLoading && (
-                <div className="flex justify-start mb-4 animate-fade-in">
-                  <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl px-6 py-4">
-                    <LoadingSpinner size="sm" />
+                <div className="flex justify-start animate-fade-in">
+                  <div className="text-sm text-zinc-600 font-light">
+                    <span className="inline-block animate-pulse">...</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Results - Show below messages */}
+              {currentMatches.length > 0 && (
+                <div className="lg:hidden mt-8 pt-8 border-t border-zinc-900">
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-base font-light text-zinc-100">
+                        Results
+                      </h3>
+                      <span className="px-2 py-0.5 bg-zinc-900 text-zinc-500 text-xs font-light rounded-full">
+                        {currentMatches.length}
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-600 font-light">
+                      Tap to view details
+                    </p>
+                  </div>
+                  <div className="space-y-3">
+                    {currentMatches.map((listing) => (
+                      <ResultCard key={listing.id} listing={listing} />
+                    ))}
                   </div>
                 </div>
               )}
@@ -131,33 +148,31 @@ export default function ChatPage() {
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-gray-800 bg-[#0f0f0f] px-4 py-5">
+          <div className="border-t border-zinc-950/50 bg-black px-4 sm:px-6 py-5 sm:py-7 relative">
             <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
               <div className="relative">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="e.g., 'I need a plumber in Scarborough' or 'Find a math tutor near me'"
-                  className="w-full px-5 py-3.5 pr-24 text-base rounded-xl border border-gray-700 bg-[#1a1a1a]
-                           text-white placeholder:text-gray-500
-                           focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-700
-                           transition-all duration-300
-                           disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isLoading}
-                  aria-label="Chat input"
-                />
-                <button
-                  type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 
-                           bg-white hover:bg-gray-200 text-black 
-                           px-5 py-2 rounded-lg font-medium text-sm
-                           transition-all duration-200
-                           disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Send
-                </button>
+                <div className="relative flex items-center bg-zinc-950/30 backdrop-blur-xl border border-zinc-800/40 rounded-full overflow-hidden hover:border-zinc-700/60 focus-within:border-zinc-700/60 transition-all duration-700 shadow-xl shadow-black/30 hover:shadow-black/50">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask for anything..."
+                    className="flex-1 px-6 sm:px-8 py-4 sm:py-5 text-sm bg-transparent text-white placeholder:text-zinc-700 font-extralight tracking-wide
+                             focus:outline-none
+                             disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading}
+                    aria-label="Chat input"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading || !input.trim()}
+                    className="mr-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white hover:bg-zinc-50 text-black rounded-full text-xs font-light tracking-wide
+                             transition-all duration-700 hover:scale-110 active:scale-105
+                             disabled:opacity-20 disabled:cursor-not-allowed shadow-lg shadow-white/20 hover:shadow-xl hover:shadow-white/30"
+                  >
+                    {isLoading ? '...' : 'Send'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -165,16 +180,21 @@ export default function ChatPage() {
 
         {/* Results Sidebar */}
         {currentMatches.length > 0 && (
-          <div className="w-96 border-l border-gray-800 bg-[#0f0f0f] overflow-y-auto animate-slide-in">
-            <div className="p-5 border-b border-gray-800 bg-[#1a1a1a] sticky top-0">
-              <h2 className="text-base font-semibold text-white">
-                Matched Results ({currentMatches.length})
-              </h2>
-              <p className="text-xs text-gray-500 mt-1">
-                Curated for you from our community
+          <div className="hidden lg:block w-96 border-l border-zinc-900 bg-zinc-950 overflow-y-auto animate-slide-in">
+            <div className="p-6 border-b border-zinc-900 bg-zinc-900/50 backdrop-blur-xl sticky top-0 z-10">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-semibold text-zinc-100">
+                  Matched Results
+                </h2>
+                <span className="px-2.5 py-1 bg-accent-500/10 border border-accent-500/20 text-accent-400 text-xs font-semibold rounded-lg">
+                  {currentMatches.length}
+                </span>
+              </div>
+              <p className="text-sm text-zinc-500">
+                Curated from our trusted community
               </p>
             </div>
-            <div className="p-3 space-y-3">
+            <div className="p-4 space-y-4">
               {currentMatches.map((listing) => (
                 <ResultCard key={listing.id} listing={listing} />
               ))}
@@ -182,35 +202,6 @@ export default function ChatPage() {
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slide-in {
-          from {
-            opacity: 0;
-            transform: translateX(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.4s ease-out;
-        }
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

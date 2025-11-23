@@ -1,53 +1,165 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const isActive = (path: string) => pathname === path;
+  const isChatPage = pathname === '/chat';
+  
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f0f0f]">
+    <div className="min-h-screen flex flex-col bg-black">
       {/* Navigation */}
-      <nav className="bg-[#0f0f0f] border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14">
+      <nav className="bg-black/80 backdrop-blur-2xl border-b border-zinc-900/30 sticky top-0 z-50 shadow-2xl shadow-black/50">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-20 sm:h-24">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
-              <div className="text-xl font-semibold text-white">
-                Buraq X
-              </div>
+              <span className="text-sm sm:text-base font-extralight text-white tracking-[0.25em] uppercase">
+                BuraqX
+              </span>
             </Link>
 
             {/* Navigation Links */}
-            <div className="flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-8 lg:space-x-10">
               <Link
                 href="/"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
+                className={`text-[11px] font-extralight tracking-[0.15em] transition-all duration-700 hover:scale-110 inline-block uppercase ${
+                  isActive('/')
+                    ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+                    : 'text-zinc-800 hover:text-zinc-600'
+                }`}
               >
                 Home
               </Link>
               <Link
-                href="/about"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                About
-              </Link>
-              <Link
                 href="/chat"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
+                className={`text-[11px] font-extralight tracking-[0.15em] transition-all duration-700 hover:scale-110 inline-block uppercase ${
+                  isActive('/chat')
+                    ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+                    : 'text-zinc-800 hover:text-zinc-600'
+                }`}
               >
                 Search
               </Link>
               <Link
                 href="/join"
-                className="bg-white hover:bg-gray-200 text-black px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                className={`text-[11px] font-extralight tracking-[0.15em] transition-all duration-700 hover:scale-110 inline-block uppercase ${
+                  isActive('/join')
+                    ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+                    : 'text-zinc-800 hover:text-zinc-600'
+                }`}
               >
-                Become a Provider
+                Join
+              </Link>
+              <Link
+                href="/about"
+                className={`text-[11px] font-extralight tracking-[0.15em] transition-all duration-700 hover:scale-110 inline-block uppercase ${
+                  isActive('/about')
+                    ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+                    : 'text-zinc-800 hover:text-zinc-600'
+                }`}
+              >
+                About
               </Link>
               <Link
                 href="/admin"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
+                className={`text-[11px] font-extralight tracking-[0.15em] transition-all duration-500 uppercase ${
+                  isActive('/admin')
+                    ? 'text-white'
+                    : 'text-zinc-800 hover:text-zinc-600'
+                }`}
               >
                 Admin
               </Link>
             </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-zinc-600 hover:text-zinc-400 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-zinc-950 bg-black">
+              <div className="px-4 py-4 space-y-3">
+                <Link
+                  href="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block py-2 text-sm font-light transition-colors ${
+                    isActive('/')
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-400'
+                  }`}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/chat"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block py-2 text-sm font-light transition-colors ${
+                    isActive('/chat')
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-400'
+                  }`}
+                >
+                  Search
+                </Link>
+                <Link
+                  href="/join"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block py-2 text-sm font-light transition-colors ${
+                    isActive('/join')
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-400'
+                  }`}
+                >
+                  Join
+                </Link>
+                <Link
+                  href="/about"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block py-2 text-sm font-light transition-colors ${
+                    isActive('/about')
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-400'
+                  }`}
+                >
+                  About
+                </Link>
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block py-2 text-sm font-light transition-colors ${
+                    isActive('/admin')
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-400'
+                  }`}
+                >
+                  Admin
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -56,56 +168,18 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* About */}
-            <div>
-              <h3 className="text-white font-semibold mb-4">Buraq X</h3>
-              <p className="text-sm">
-                Your trusted Muslim community concierge. Connecting you with verified providers,
-                freelancers, and community services.
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-white font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/chat" className="hover:text-white transition-colors">
-                    Start a Request
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/join" className="hover:text-white transition-colors">
-                    Become a Provider
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#categories" className="hover:text-white transition-colors">
-                    Browse Categories
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h3 className="text-white font-semibold mb-4">Contact</h3>
-              <p className="text-sm">
-                Questions or feedback?<br />
-                Email: hello@buraqx.com
+      {/* Footer - Hidden on chat page */}
+      {!isChatPage && (
+        <footer className="bg-black border-t border-zinc-950">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+            <div className="text-center">
+              <p className="text-xs text-zinc-800 font-light">
+                &copy; {new Date().getFullYear()} BuraqX
               </p>
             </div>
           </div>
-
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} Buraq X. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }

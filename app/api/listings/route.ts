@@ -90,11 +90,25 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
     const categoryId = searchParams.get('categoryId');
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
 
     let listings: Listing[];
 
+    // If ID is provided, fetch single listing
+    if (id) {
+      const listing = await listingRepository.getListingById(id);
+      if (!listing) {
+        return NextResponse.json(
+          { error: 'Listing not found' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ listings: [listing] });
+    }
+
+    // Otherwise fetch by category or all listings
     if (categoryId) {
       listings = await listingRepository.getListingsByCategory(categoryId, limit);
     } else {

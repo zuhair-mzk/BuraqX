@@ -32,16 +32,24 @@ export async function POST(request: NextRequest) {
     // Parse the user's message with AI
     const parsed = await parseUserRequest(message, location);
 
-    // If category is not supported, log as suggestion and return fallback
+    // If category is not supported (could be conversation or truly unsupported)
     if (!parsed.isSupported) {
-      await suggestionRepository.addSuggestion(
-        message,
-        undefined,
-        parsed.location || location
-      );
+      // Use AI-generated conversational response if available
+      let answerText: string;
+      if (parsed.conversationalResponse) {
+        answerText = parsed.conversationalResponse;
+      } else {
+        // Fallback for unsupported service requests
+        await suggestionRepository.addSuggestion(
+          message,
+          undefined,
+          parsed.location || location
+        );
+        answerText = "I'd love to help with that! Could you tell me more about what you're looking for?";
+      }
 
       const response: ChatResponse = {
-        answerText: formatUnsupportedResponse(),
+        answerText,
         matches: [],
         category: null,
         isSupported: false,

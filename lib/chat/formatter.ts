@@ -10,7 +10,7 @@ import { Listing, Category } from '../models';
  * Format a friendly greeting response
  */
 export function formatGreeting(): string {
-  return "As-salamu alaykum! I'm Buraq X, your Muslim community concierge. How can I help you today? You can ask me about STEM tutoring, creative freelancers, home services, masjid events, or wedding services.";
+  return "As-salamu alaykum! I'm here to help you find trusted professionals in the community. What do you need help with today?";
 }
 
 /**
@@ -36,17 +36,64 @@ export function formatMatchResponse(
 /**
  * Format a response when no category is matched (unsupported request)
  */
-export function formatUnsupportedResponse(): string {
-  return `JazakAllah khair for your request! Unfortunately, this type of service isn't available on Buraq X yet. We've logged your request and will prioritize it as we grow inshaAllah. 
-
-In the meantime, we currently support:
-• STEM Tutoring (math, physics, computer science)
-• Creative Freelancers (photographers, videographers, designers)
-• Home Services (plumbers, electricians, handymen)
-• Masjid & MSA Events (halaqas, youth events)
-• Wedding Services (henna, decor, photography - no catering yet)
-
-Feel free to ask about any of these categories!`;
+export function formatUnsupportedResponse(message: string): string {
+  const messageLower = message.toLowerCase().trim();
+  
+  // Greetings
+  if (['hi', 'hey', 'hello', 'yo', 'yeo', 'sup', "what's up", 'howdy'].some(g => messageLower === g || messageLower.startsWith(g + ' '))) {
+    return "Hey! What's up?";
+  }
+  
+  // Thanks
+  if (['thanks', 'thank you', 'thx', 'ty'].some(t => messageLower.includes(t))) {
+    return "You're welcome!";
+  }
+  
+  // How are you / how's everything variations
+  if (messageLower.includes('how are you') || messageLower.includes('how r u') || 
+      messageLower.includes("how's everything") || messageLower.includes("hows everything") ||
+      messageLower.includes("how are things") || messageLower.includes("how's it going") ||
+      messageLower.includes("hows it going") || messageLower.includes("how you doing")) {
+    return "I'm good, thanks for asking! How can I help you today?";
+  }
+  
+  // Responses to "how are you" or personal status
+  if (messageLower.includes("i'm good") || messageLower.includes("im good") || 
+      messageLower.includes("i'm fine") || messageLower.includes("im fine") ||
+      messageLower.includes("doing good") || messageLower.includes("doing well")) {
+    return "Nice! Let me know if you need anything.";
+  }
+  
+  if (messageLower.includes("tired") || messageLower.includes("exhausted") || 
+      messageLower.includes("sleepy") || messageLower.includes("worn out")) {
+    return "Hope you get some rest! If you need anything, just let me know.";
+  }
+  
+  if (messageLower.includes("busy") || messageLower.includes("stressed") || messageLower.includes("overwhelmed")) {
+    return "I hear you. Let me know if there's anything I can help with!";
+  }
+  
+  if (messageLower.includes("not bad") || messageLower.includes("alright") || messageLower.includes("okay")) {
+    return "Cool. What can I do for you?";
+  }
+  
+  // Generic help without specifics
+  if (messageLower === 'help' || messageLower === 'i need help' || messageLower === 'can you help') {
+    return "Sure! What do you need help with?";
+  }
+  
+  // What questions
+  if (messageLower.includes('what do you do') || messageLower.includes('what is this') || messageLower.includes('who are you')) {
+    return "I help you find trusted professionals in the community. Just tell me what you're looking for!";
+  }
+  
+  // Affirmations
+  if (['ok', 'okay', 'cool', 'nice', 'great', 'awesome', 'perfect'].some(a => messageLower === a)) {
+    return "👍";
+  }
+  
+  // Default for unclear requests
+  return "What can I help you with?";
 }
 
 /**
