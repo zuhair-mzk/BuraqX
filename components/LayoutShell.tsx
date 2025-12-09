@@ -47,7 +47,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
                   { href: '/dashboard', label: 'Dashboard' },
                   { href: '/join', label: 'Join' },
                   { href: '/about', label: 'About' },
-                  { href: '/admin', label: 'Admin' },
                 ].map((link) => (
                   <Link
                     key={link.href}
@@ -105,7 +104,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
                     { href: '/dashboard', label: 'Dashboard' },
                     { href: '/join', label: 'Join' },
                     { href: '/about', label: 'About' },
-                    { href: '/admin', label: 'Admin' },
                   ].map((link) => (
                     <Link
                       key={link.href}

@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { id, title, messages, category } = body;
+    const { id, title, messages, matches, category } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -70,6 +70,7 @@ export async function POST(request: Request) {
         data: {
           title: title || 'Untitled Chat',
           messages,
+          matches,
           category,
           updatedAt: new Date(),
         },
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
         userId: user.id,
         title: title || 'Untitled Chat',
         messages,
+        matches,
         category,
       },
     });

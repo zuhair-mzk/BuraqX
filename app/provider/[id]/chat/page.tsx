@@ -153,18 +153,18 @@ export default function ProviderChatPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-zinc-700 font-extralight animate-pulse">Loading...</div>
+      <div className="min-h-screen bg-[#212121] flex items-center justify-center">
+        <div className="text-zinc-500 font-extralight animate-pulse">Loading...</div>
       </div>
     );
   }
 
   if (!provider) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#212121] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-extralight text-white mb-4">Provider not found</h1>
-          <button onClick={() => router.back()} className="text-sm text-zinc-600 hover:text-zinc-400">
+          <button onClick={() => router.back()} className="text-sm text-zinc-400 hover:text-zinc-300">
             Go back
           </button>
         </div>
@@ -173,14 +173,14 @@ export default function ProviderChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-black">
+    <div className="flex flex-col h-screen bg-[#212121]">
       {/* Header */}
-      <div className="border-b border-zinc-950/50 bg-black/80 backdrop-blur-md px-6 py-5">
+      <div className="border-b border-zinc-800/30 bg-[#2a2a2a]/80 backdrop-blur-md px-6 py-5">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex-1">
             <button
               onClick={() => router.push(`/provider/${params.id}`)}
-              className="flex items-center text-xs text-zinc-700 hover:text-zinc-500 mb-3 transition-all duration-500 font-extralight tracking-wider uppercase"
+              className="flex items-center text-xs text-zinc-500 hover:text-zinc-400 mb-3 transition-all duration-500 font-extralight tracking-wider uppercase"
             >
               <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -190,7 +190,7 @@ export default function ProviderChatPage() {
             <h1 className="text-lg font-extralight text-white tracking-wide">
               {provider.title}
             </h1>
-            <p className="text-xs text-zinc-800 font-extralight mt-1 tracking-wider">
+            <p className="text-xs text-zinc-500 font-extralight mt-1 tracking-wider">
               AI Assistant
             </p>
           </div>
@@ -210,13 +210,13 @@ export default function ProviderChatPage() {
                   className={`${
                     message.role === 'user'
                       ? 'text-white text-right'
-                      : 'text-zinc-400 text-left'
+                      : 'text-zinc-300 text-left'
                   } text-sm font-extralight leading-relaxed`}
                 >
                   {message.content}
                 </div>
                 <div
-                  className={`text-xs text-zinc-800 font-extralight mt-2 ${
+                  className={`text-xs text-zinc-500 font-extralight mt-2 ${
                     message.role === 'user' ? 'text-right' : 'text-left'
                   }`}
                 >
@@ -231,7 +231,7 @@ export default function ProviderChatPage() {
 
           {isSending && (
             <div className="flex justify-start">
-              <div className="text-sm text-zinc-700 font-extralight">
+              <div className="text-sm text-zinc-500 font-extralight">
                 <span className="inline-block animate-pulse">...</span>
               </div>
             </div>
@@ -242,16 +242,16 @@ export default function ProviderChatPage() {
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-zinc-950/50 bg-black px-4 sm:px-6 py-5 sm:py-7">
+      <div className="border-t border-zinc-800/30 bg-[#2a2a2a] px-4 sm:px-6 py-5 sm:py-7">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           <div className="relative">
-            <div className="relative flex items-center bg-zinc-950/30 backdrop-blur-sm border border-zinc-900/50 rounded-full overflow-hidden hover:border-zinc-800 focus-within:border-zinc-800 transition-all duration-700">
+            <div className="relative flex items-center bg-[#343434] backdrop-blur-sm border border-zinc-700/30 rounded-full overflow-hidden hover:border-zinc-600 focus-within:border-zinc-600 transition-all duration-700">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about availability, services, pricing..."
-                className="flex-1 px-6 sm:px-8 py-4 sm:py-5 text-sm bg-transparent text-white placeholder:text-zinc-800
+                className="flex-1 px-6 sm:px-8 py-4 sm:py-5 text-sm bg-transparent text-white placeholder:text-zinc-500
                          focus:outline-none font-extralight tracking-widest
                          disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSending}

@@ -36,7 +36,7 @@ export default function ChatPage() {
   const [input, setInput] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(false);
   const [currentMatches, setCurrentMatches] = useState<Listing[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [chatCategory, setChatCategory] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -65,35 +65,28 @@ export default function ChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatIdFromUrl]);
 
-  // Auto-submit query from homepage
+  // Auto-submit query from homepage (wait for user to load)
   useEffect(() => {
-    if (initialQuery && !hasSubmittedInitialQuery.current && !chatIdFromUrl) {
+    if (initialQuery && !hasSubmittedInitialQuery.current && !chatIdFromUrl && user !== undefined) {
       hasSubmittedInitialQuery.current = true;
       handleSubmit(new Event('submit') as any);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   const fetchUser = async () => {
     try {
       const response = await fetch('/api/auth/me');
       const data = await response.json();
-      setUser(data.user);
+      setUser(data.user || null);
     } catch (error) {
       console.error('Error fetching user:', error);
+      setUser(null);
     }
   };
 
   const saveChatHistory = async (updatedMessages: ChatMessageType[], category?: string) => {
-    console.log('[CHAT HISTORY] Attempting to save:', { 
-      hasUser: !!user, 
-      messageCount: updatedMessages.length,
-      category,
-      currentChatId 
-    });
-    
     if (!user || updatedMessages.length === 0) {
-      console.log('[CHAT HISTORY] Skipping save - no user or no messages');
       return;
     }
 
@@ -104,8 +97,6 @@ export default function ChatPage() {
         ? firstUserMessage.content.slice(0, 50) + (firstUserMessage.content.length > 50 ? '...' : '')
         : 'Untitled Chat';
 
-      console.log('[CHAT HISTORY] Saving with title:', title);
-
       const response = await fetch('/api/chat-history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,20 +105,20 @@ export default function ChatPage() {
           title,
           messages: updatedMessages,
           category: category || chatCategory,
+          matches: currentMatches, // Save search results
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('[CHAT HISTORY] Saved successfully:', data.chat.id);
         if (!currentChatId) {
           setCurrentChatId(data.chat.id);
         }
-      } else {
-        console.error('[CHAT HISTORY] Save failed:', await response.text());
+        // Trigger sidebar refresh by dispatching custom event
+        window.dispatchEvent(new CustomEvent('chatHistoryUpdated'));
       }
     } catch (error) {
-      console.error('[CHAT HISTORY] Error saving chat history:', error);
+      console.error('Error saving chat history:', error);
     }
   };
 
@@ -144,7 +135,12 @@ export default function ChatPage() {
         setMessages(messagesWithDates);
         setCurrentChatId(data.chat.id);
         setChatCategory(data.chat.category);
-        setCurrentMatches([]);
+        // Restore search results if they exist
+        if (data.chat.matches && Array.isArray(data.chat.matches)) {
+          setCurrentMatches(data.chat.matches);
+        } else {
+          setCurrentMatches([]);
+        }
       }
     } catch (error) {
       console.error('Error loading chat:', error);
@@ -246,14 +242,10 @@ export default function ChatPage() {
               {/* Result Cards Inside Chat */}
               {currentMatches.length > 0 && (
                 <div className="mt-6">
-                  <div className="relative overflow-hidden py-2">
-                    <div className="flex animate-scroll-left hover:[animation-play-state:paused] gap-4">
-                      {currentMatches.concat(currentMatches).map((listing, index) => (
-                        <div key={`result-${listing.id}-${index}`} className="flex-shrink-0 w-80">
-                          <ResultCard listing={listing} />
-                        </div>
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {currentMatches.map((listing) => (
+                      <ResultCard key={listing.id} listing={listing} />
+                    ))}
                   </div>
                 </div>
               )}
@@ -264,21 +256,21 @@ export default function ChatPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start mb-3"
                 >
-                  <div className="px-4 py-2.5 bg-[#1e1e1e] rounded-[20px] shadow-md shadow-black/40">
+                  <div className="px-4 py-2.5 bg-zinc-800/40 rounded-[20px] shadow-md shadow-black/20">
                     <div className="flex gap-1.5">
                       <motion.div
-                        className="w-1.5 h-1.5 bg-gray-500 rounded-full"
-                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        className="w-1.5 h-1.5 bg-zinc-400 rounded-full"
+                        animate={{ opacity: [0.4, 1, 0.4] }}
                         transition={{ duration: 1.2, repeat: Infinity, delay: 0, ease: "easeInOut" }}
                       />
                       <motion.div
-                        className="w-1.5 h-1.5 bg-gray-500 rounded-full"
-                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        className="w-1.5 h-1.5 bg-zinc-400 rounded-full"
+                        animate={{ opacity: [0.4, 1, 0.4] }}
                         transition={{ duration: 1.2, repeat: Infinity, delay: 0.2, ease: "easeInOut" }}
                       />
                       <motion.div
-                        className="w-1.5 h-1.5 bg-gray-500 rounded-full"
-                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        className="w-1.5 h-1.5 bg-zinc-400 rounded-full"
+                        animate={{ opacity: [0.4, 1, 0.4] }}
                         transition={{ duration: 1.2, repeat: Infinity, delay: 0.4, ease: "easeInOut" }}
                       />
                     </div>
@@ -293,13 +285,13 @@ export default function ChatPage() {
           {/* Input Area */}
           <div className={`border-t border-white/5 bg-gradient-to-b from-[#0a0a0a]/80 to-[#0a0a0a]/95 backdrop-blur-xl px-4 sm:px-6 py-6 relative transition-all duration-700 ease-in-out ${isMorphing ? 'translate-y-[35vh] scale-95 opacity-0' : ''}`}>
             <form onSubmit={handleSubmit} className="max-w-[760px] mx-auto">
-              <div className="relative flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.04] border border-white/10 rounded-full px-5 py-3 shadow-2xl shadow-black/40 transition-all duration-300 focus-within:border-[#0ea5e9]/50 focus-within:shadow-[0_0_30px_rgba(14,165,233,0.15)]">
+              <div className="relative flex items-center gap-3 bg-white/[0.05] hover:bg-white/[0.07] border border-white/[0.15] rounded-full px-5 py-3 shadow-2xl shadow-black/40 transition-all duration-300 focus-within:border-[#0ea5e9]/50 focus-within:shadow-[0_0_30px_rgba(14,165,233,0.15)]">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Message..."
-                  className="flex-1 text-[15px] bg-transparent text-white placeholder:text-white/30
+                  className="flex-1 text-[15px] bg-transparent text-white placeholder:text-zinc-400
                            border-0 focus:outline-0 focus:ring-0 outline-0 ring-0 p-0
                            disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading}

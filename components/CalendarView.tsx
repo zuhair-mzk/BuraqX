@@ -23,6 +23,8 @@ export default function CalendarView({ userId }: CalendarViewProps) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isEventListOpen, setIsEventListOpen] = useState(false);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -98,17 +100,54 @@ export default function CalendarView({ userId }: CalendarViewProps) {
   const handleDateClick = (day: number) => {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     setSelectedDate(selected);
-    setIsEventModalOpen(true);
+    
+    // Check if there are existing events on this day
+    const dayEvents = getEventsForDay(day);
+    
+    if (dayEvents.length > 0) {
+      // Show event list modal if there are events
+      setSelectedDayEvents(dayEvents);
+      setIsEventListOpen(true);
+    } else {
+      // No events, create new
+      openNewEventModal(selected);
+    }
+  };
+
+  const openNewEventModal = (date: Date) => {
     setEditingEvent(null);
+    // Pre-fill with selected date at 9 AM and 10 AM
+    const startTime = new Date(date);
+    startTime.setHours(9, 0, 0, 0);
+    const endTime = new Date(date);
+    endTime.setHours(10, 0, 0, 0);
+    
     setFormData({
       title: '',
       description: '',
-      startTime: '',
-      endTime: '',
+      startTime: startTime.toISOString().slice(0, 16),
+      endTime: endTime.toISOString().slice(0, 16),
       location: '',
       color: '#3b82f6',
       isAllDay: false,
     });
+    setSelectedDate(date);
+    setIsEventModalOpen(true);
+  };
+
+  const openEditEventModal = (event: CalendarEvent) => {
+    setEditingEvent(event);
+    setFormData({
+      title: event.title,
+      description: event.description || '',
+      startTime: event.startTime.toISOString().slice(0, 16),
+      endTime: event.endTime.toISOString().slice(0, 16),
+      location: event.location || '',
+      color: event.color || '#3b82f6',
+      isAllDay: event.isAllDay,
+    });
+    setIsEventListOpen(false);
+    setIsEventModalOpen(true);
   };
 
   const handleSaveEvent = async () => {
@@ -185,6 +224,15 @@ export default function CalendarView({ userId }: CalendarViewProps) {
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h2>
         <div className="flex gap-2">
+          <button
+            onClick={() => openNewEventModal(new Date())}
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Event
+          </button>
           <button
             onClick={handlePreviousMonth}
             className="p-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-700/60 text-zinc-300 transition-colors duration-200"
@@ -413,6 +461,107 @@ export default function CalendarView({ userId }: CalendarViewProps) {
                   </button>
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Event List Modal */}
+      <AnimatePresence>
+        {isEventListOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setIsEventListOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-zinc-900 to-zinc-900/90 border border-zinc-700 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-white">
+                  Events on {selectedDate?.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                </h3>
+                <button
+                  onClick={() => setIsEventListOpen(false)}
+                  className="text-zinc-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-3 mb-4">
+                {selectedDayEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="p-4 bg-zinc-800/60 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer group"
+                    onClick={() => openEditEventModal(event)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: event.color }}
+                          />
+                          <h4 className="text-white font-medium">{event.title}</h4>
+                        </div>
+                        {event.description && (
+                          <p className="text-sm text-zinc-400 mb-2">{event.description}</p>
+                        )}
+                        <p className="text-xs text-zinc-500">
+                          {event.isAllDay
+                            ? 'All day'
+                            : `${new Date(event.startTime).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                              })} - ${new Date(event.endTime).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                              })}`}
+                        </p>
+                        {event.location && (
+                          <p className="text-xs text-zinc-500 mt-1">📍 {event.location}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm('Delete this event?')) {
+                            handleDeleteEvent(event.id);
+                            setIsEventListOpen(false);
+                          }
+                        }}
+                        className="text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  setIsEventListOpen(false);
+                  openNewEventModal(selectedDate!);
+                }}
+                className="w-full px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Another Event
+              </button>
             </motion.div>
           </motion.div>
         )}

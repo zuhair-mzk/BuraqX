@@ -15,18 +15,18 @@ export default function ResultCard({ listing }: ResultCardProps) {
             <h3 className="text-[15px] font-medium text-white mb-1">
               {listing.title}
             </h3>
-            <p className="text-[13px] text-gray-500">
+            <p className="text-[13px] text-zinc-400">
               {listing.locationText}
             </p>
           </div>
           {listing.isFeatured && (
-            <span className="flex-shrink-0 ml-3 px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[11px] text-gray-400">
+            <span className="flex-shrink-0 ml-3 px-2 py-0.5 bg-white/[0.06] border border-white/[0.15] rounded text-[11px] text-zinc-300">
               Featured
             </span>
           )}
         </div>
 
-        <p className="text-[13px] text-gray-400 mb-4 line-clamp-2 leading-relaxed">
+        <p className="text-[13px] text-zinc-300 mb-4 line-clamp-2 leading-relaxed">
           {listing.description}
         </p>
 
@@ -56,7 +56,7 @@ export default function ResultCard({ listing }: ResultCardProps) {
             {listing.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 bg-[#0A0A0B] border border-gray-900 rounded text-[11px] text-gray-500"
+                className="px-2 py-0.5 bg-zinc-800/40 border border-zinc-700/50 rounded text-[11px] text-zinc-400"
               >
                 {tag}
               </span>

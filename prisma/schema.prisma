@@ -25,6 +25,7 @@ model ChatHistory {
   userId       String
   title        String
   messages     Json
+  matches      Json?    // Store search results
   category     String?
   chatType     String   @default("general") // "general", "provider_ai", "direct_provider"
   providerId   String?

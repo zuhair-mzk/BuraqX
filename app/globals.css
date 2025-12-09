@@ -9,7 +9,7 @@
   }
   
   body {
-    @apply bg-[#0d0d0f] text-white;
+    @apply bg-[#121214] text-white;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -31,16 +31,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-zinc-900;
+    @apply bg-zinc-900/50;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-800/50 rounded-full;
+    @apply bg-zinc-700/60 rounded-full;
     transition: background-color 0.3s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-700/70;
+    @apply bg-zinc-600/80;
   }
 
   /* Premium focus rings */

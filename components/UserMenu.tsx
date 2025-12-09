@@ -55,7 +55,7 @@ export default function UserMenu() {
       <div className="flex items-center gap-4">
         <Link
           href="/login"
-          className="text-[11px] font-extralight tracking-[0.15em] transition-all duration-700 hover:scale-110 inline-block uppercase text-zinc-800 hover:text-zinc-600"
+          className="text-[11px] font-extralight tracking-[0.15em] transition-all duration-700 hover:scale-110 inline-block uppercase text-zinc-400 hover:text-zinc-300"
         >
           Login
         </Link>

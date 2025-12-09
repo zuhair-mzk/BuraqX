@@ -24,6 +24,17 @@ export default function ChatHistorySidebar({ onLoadChat, currentChatId }: ChatHi
 
   useEffect(() => {
     fetchChats();
+    
+    // Listen for chat history updates
+    const handleChatUpdate = () => {
+      fetchChats();
+    };
+    
+    window.addEventListener('chatHistoryUpdated', handleChatUpdate);
+    
+    return () => {
+      window.removeEventListener('chatHistoryUpdated', handleChatUpdate);
+    };
   }, []);
 
   const fetchChats = async () => {
@@ -74,7 +85,7 @@ export default function ChatHistorySidebar({ onLoadChat, currentChatId }: ChatHi
 
   if (isLoading) {
     return (
-      <div className="w-56 border-r border-zinc-800/30 bg-[#0d0d0f]/80 backdrop-blur-xl p-3">
+      <div className="w-56 border-r border-zinc-700/30 bg-zinc-900/60 backdrop-blur-xl p-3">
         <div className="animate-pulse space-y-2">
           <div className="h-4 bg-gray-900 rounded w-3/4"></div>
           <div className="h-12 bg-gray-900 rounded"></div>
@@ -124,15 +135,17 @@ export default function ChatHistorySidebar({ onLoadChat, currentChatId }: ChatHi
                 </svg>
               </button>
             </div>
-            <Link href="/chat" onClick={() => setIsOpen(false)}>
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-4 py-2.5 bg-gradient-to-br from-[#0ea5e9]/10 to-[#0284c7]/10 border border-[#0ea5e9]/20 text-white text-sm font-medium rounded-xl hover:border-[#0ea5e9]/40 transition-all duration-200 shadow-lg shadow-[#0ea5e9]/5"
-              >
-                + New Chat
-              </motion.button>
-            </Link>
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                setIsOpen(false);
+                window.location.href = '/chat';
+              }}
+              className="w-full px-4 py-2.5 bg-gradient-to-br from-[#0ea5e9]/10 to-[#0284c7]/10 border border-[#0ea5e9]/20 text-white text-sm font-medium rounded-xl hover:border-[#0ea5e9]/40 transition-all duration-200 shadow-lg shadow-[#0ea5e9]/5"
+            >
+              + New Chat
+            </motion.button>
           </div>
 
           {/* Navigation Links */}
@@ -169,15 +182,6 @@ export default function ChatHistorySidebar({ onLoadChat, currentChatId }: ChatHi
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   About
-                </div>
-              </Link>
-              <Link href="/admin" onClick={() => setIsOpen(false)}>
-                <div className="flex items-center px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200">
-                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Admin
                 </div>
               </Link>
             </nav>

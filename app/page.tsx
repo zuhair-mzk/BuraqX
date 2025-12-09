@@ -1,12 +1,32 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+
+const quranVerses = [
+  { text: "And cooperate in righteousness and piety", reference: "Surah Al-Ma'idah, 5:2" },
+  { text: "Indeed, Allah is with those who are patient", reference: "Surah Al-Baqarah, 2:153" },
+  { text: "Verily, with hardship comes ease", reference: "Surah Ash-Sharh, 94:6" },
+  { text: "And whoever puts their trust in Allah, He will be sufficient for them", reference: "Surah At-Talaq, 65:3" },
+  { text: "So remember Me; I will remember you", reference: "Surah Al-Baqarah, 2:152" },
+  { text: "Allah does not burden a soul beyond that it can bear", reference: "Surah Al-Baqarah, 2:286" },
+  { text: "And He is with you wherever you are", reference: "Surah Al-Hadid, 57:4" },
+];
 
 export default function HomePage() {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Get daily verse based on day of year
+  const dailyVerse = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now.getTime() - start.getTime();
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    return quranVerses[dayOfYear % quranVerses.length];
+  }, []);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -182,9 +202,9 @@ export default function HomePage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="What are you looking for?"
-                className="w-full px-7 py-4 bg-zinc-900/60 border border-white/[0.08] rounded-full 
-                         text-white placeholder:text-gray-600 text-base
-                         focus:outline-none focus:border-white/20 focus:bg-black/60
+                className="w-full px-7 py-4 bg-zinc-900/60 border border-white/[0.12] rounded-full 
+                         text-white placeholder:text-zinc-400 text-base
+                         focus:outline-none focus:border-white/25 focus:bg-zinc-800/70
                          backdrop-blur-2xl transition-all duration-300
                          shadow-[0_0_1px_rgba(255,255,255,0.05)]
                          focus:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
@@ -215,12 +235,12 @@ export default function HomePage() {
         <div className="flex flex-col items-center gap-2 px-6">
           {/* English translation */}
           <p className="text-base sm:text-lg text-gray-400 italic opacity-0 animate-fade-in" style={{ animationDelay: '0s', animationFillMode: 'forwards' }}>
-            "And cooperate in righteousness and piety"
+            "{dailyVerse.text}"
           </p>
           
           {/* Surah reference */}
           <p className="text-xs text-zinc-600 opacity-0 animate-fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
-            Surah Al-Ma'idah, 5:2
+            {dailyVerse.reference}
           </p>
         </div>
       </div>
